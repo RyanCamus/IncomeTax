@@ -1,0 +1,32 @@
+body {
+  text-align: center;
+  background-color: #dff1e1;
+  margin-top: 30px;
+  margin: 0 auto;
+}
+
+section,
+header {
+  margin: 2rem auto;
+  padding: 1.5rem;
+  max-width: 900px;
+  min-width: 300px;
+  background-color: rgba(183, 228, 199, 0.9);
+  border-radius: 2.5rem;
+}
+
+#results {
+  background-color: rgba(82, 183, 136, 0.8);
+}
+
+
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

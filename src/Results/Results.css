@@ -1,0 +1,11 @@
+ul li {
+    list-style: none;
+}
+
+div:focus {
+    display:block;
+}
+
+div {
+    transition: height 2s;
+}
