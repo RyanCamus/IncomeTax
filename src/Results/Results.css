@@ -6,6 +6,15 @@ div:focus {
     display:block;
 }
 
-div {
-    transition: height 2s;
+section {
+  margin: 2rem auto;
+  padding: 1.5rem;
+  max-width: 900px;
+  min-width: 300px;
+  border-radius: 2.5rem;
+}
+
+#results {
+  background-color: rgb(82, 183, 136);
+  margin-top: 0;
 }

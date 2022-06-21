@@ -2,51 +2,36 @@ import React from 'react'
 import './Form.css'
 
 export class Form extends React.Component {
-    //Takes in information from the form and sends it to App.js for processing
     constructor(props) {
         super(props);
-        this.handleWage = this.handleWage.bind(this);
-        this.handleHoursWorked = this.handleHoursWorked.bind(this);
-        this.changeWageType = this.changeWageType.bind(this);
-        this.switchCurrency = this.switchCurrency.bind(this);
-        this.handleScotland = this.handleScotland.bind(this);
+        this.handleInputs = this.handleInputs.bind(this)
     }
 
-    //combine all of these into a single function?
 
-    handleWage(e) {
-        this.props.handleWage(e.target.value)
+    //collects all inputs together and passes them to App.js for processing. Name and value will both be used by the input handler in App.js
+    handleInputs(e) {
+        this.props.handleInputs(e.target.value, e.target.name)
     }
 
-    changeWageType(e) {  
-        this.props.changeWageType(e.target.value)
-    }
-
-    handleHoursWorked(e) {
-        this.props.handleHoursWorked(e.target.value)
-    }
-
-    switchCurrency(e) {
-        this.props.switchCurrency(e.target.value)
-    }
-
-    handleScotland(e) {
-        this.props.handleScotland(e.target.value)
+    fillCurrencies() {
+      const currencies = ["GBP £", "USD $", "CNY ¥", "EUR €", "AUD A$", "CAD C$", "HKD HK$", "SGD S$", "RUB ₽", "JPY ¥", "INR ₹"];
+      const listOfCurrencies = currencies.map((currency) => {
+        return <option value={currency} key={currency}>{currency}</option>
+      })
+      return listOfCurrencies;
     }
 
     render() { 
         return(
         <form>
           <div className="currency survey">
-            <label for="currency">Select currency: (exchange rates updated 11/06/2022)  </label>
-            <select value={this.props.currency} onChange={this.switchCurrency}>
-                <option value="GBP">GBP £</option>
-                <option value="USD">USD $</option>
-                <option value="RMB">RMB ¥</option>
+            <label for="currency">Select currency: </label>
+            <select name="currency" aria-label="This changes the input and output currencies only. The tax calculations are still based on GBP values." value={this.props.currency} onChange={this.handleInputs}>
+              {this.fillCurrencies()}
             </select>
           </div>
           <p>How is your wage calculated?</p>
-          <div className="radio survey" id="wageType" onChange={this.changeWageType}>
+          <div className="radio survey" id="wageType" name="wageType" onChange={this.handleInputs}>
           <div>
             <label for="hourly">Hourly<br />
             <input type="radio" name="wageType" id="hourly" value="hourly" />
@@ -71,22 +56,22 @@ export class Form extends React.Component {
 
           <div className="hours-worked survey" id="hoursWorked" style={{display: this.props.showHoursWorked}}>
             <label>Approximately how many hours do you work per week?
-                <input type="number" id="hours" step="5" max="168" min="0" onChange={this.handleHoursWorked}/>
+                <input type="number" name="hoursWorked" id="hours" step="5" max="168" min="0" onChange={this.handleInputs}/>
             </label>
           </div>
 
           <div className="wage-amount survey">
             <label>Wage amount in {this.props.currency}
-                <input type="number" id="salary" min="0" step={this.props.salaryStep} onChange={this.handleWage}/>
+                <input type="number" id="salary" name="wage" min="0" step={this.props.salaryStep} onChange={this.handleInputs}/>
             </label>
           </div>
 
-          <div className="scotland survey" onChange={this.handleScotland}>Do you live in Scotland?<br />
+          <div className="scotland survey" onChange={this.handleInputs}>Do you live in Scotland?<br />
                 <label>Yes
-                <input type="radio" name="scotland" value={true}/>
+                <input type="radio" name="isScotland" value={true}/>
                 </label>
                 <label>No
-                <input type="radio" name="scotland" value={false} />
+                <input type="radio" name="isScotland" value={false} defaultChecked/>
                 </label>
           </div>
 

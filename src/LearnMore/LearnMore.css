@@ -1,0 +1,16 @@
+h3 {
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+.chevron {
+    height: 1rem;
+    pointer-events: none;
+    transition: all .5s ease;
+    padding: 0 5px;
+  }
+
+.collapsible {
+    transition: all 1.5s ease;
+    overflow: hidden;
+}

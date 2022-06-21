@@ -5,10 +5,9 @@ import { Results } from '../Results/Results'
 import { TaxCalculator } from '../TaxCalculator/taxCalculator';
 import { LearnMore } from '../LearnMore/LearnMore';
 import { Header } from '../Header/Header'
+import { Currencies } from '../Currencies'
 
 export class App extends React.Component {
-  //condense currency elements into a single array
-  //condense other states as much as possible too
   constructor(props) {
     super(props)
     this.state= ({ 
@@ -19,55 +18,44 @@ export class App extends React.Component {
       hoursWorked: 0,
       salaryStep: 1,
       showHoursWorked: "none",
-      currency: "GBP",
-      currencySymbol: '£',
+      currency: "GBP £",
       currencyMultiplier: 1,
-      incomeTax: 0,
-      insuranceTax: 0,
-      netIncome: 0,
       isScotland: false,
+      taxes: [0, 0, 0],
     })
-    this.handleWage = this.handleWage.bind(this);
-    this.changeWageType = this.changeWageType.bind(this);
-    this.handleHoursWorked = this.handleHoursWorked.bind(this);
     this.updateIncome = this.updateIncome.bind(this)
-    this.showHoursWorked = this.showHoursWorked.bind(this)
-    this.switchCurrency = this.switchCurrency.bind(this)
-    this.handleScotland = this.handleScotland.bind(this)
+    this.handleInputs = this.handleInputs.bind(this)
   }  
-  
-  switchCurrency(currency) {
-    let currencyMultiplier;
-    let currencySymbol;
-    switch(currency) {
-      case 'USD': 
-        currencyMultiplier=0.81;
-        currencySymbol='$'; 
-        break;
-      case 'RMB': 
-        currencyMultiplier=0.12;
-        currencySymbol='¥'; 
-        break;
-      default: 
-        currencyMultiplier=1; 
-        currencySymbol='£'
-        break;
+
+  //collects all inputted values from Form.js, initiates further processing if necessary
+  handleInputs(value, name) {
+    if(name==="currency") {
+      this.switchCurrency(value);
+    } else if(name==="wageType") {
+      this.changeWageType(value)
+    } else if(name==="hoursWorked") {
+      this.setState({hoursWorked: value}, () => this.changeWageType('hourly'))
+    } else {
+      this.setState({[name]: value}, () => this.updateIncome())
     }
-    this.setState({
-      currency: currency,
-      currencyMultiplier: currencyMultiplier,
-      currencySymbol: currencySymbol,
-    }, () => this.updateIncome())
+  }
+  
+
+  //changes the currency and currency conversion multiplier using converter API. Next step: fetch countries, codes and symbols from the API
+  async switchCurrency(currency) {
+    let targetCurrency = currency.slice(0,3);
+    let currencyMultiplier = await Currencies.getExchangeRate(targetCurrency);
+    if (typeof currencyMultiplier === "number") {
+      this.setState({
+        currency: currency,
+        currencyMultiplier: currencyMultiplier,
+      }, () => this.updateIncome())
+    } else {
+      window.alert('Error with the currency converter API. Please try again later. (you can still use the app, just can\'t change currencies)')
+    }
   }
 
-  handleWage(wage) {
-    this.setState({wage: wage}, () => this.updateIncome())
-  }
-
-  handleHoursWorked(hours) {
-    this.setState({hoursWorked: hours}, () => { this.changeWageType('hourly') })
-  }
-
+  //changes the income calculation and number input step-up/down based on type of wage
   changeWageType(wageType) {
     let wageMultiplier;
     let salaryStep;
@@ -96,8 +84,10 @@ export class App extends React.Component {
       this.showHoursWorked()
       this.updateIncome()
     })
+    //calls showHoursWorked to make the hours input appear and disappear
   }
 
+  //makes number of hours worked input appear or disappear
   showHoursWorked() {
     if(this.state.wageType==="hourly") {
       this.setState({showHoursWorked: "block"})
@@ -106,17 +96,14 @@ export class App extends React.Component {
     }
   }
 
-  handleScotland(isScotland) {
-    this.setState({isScotland: isScotland},
-      () => this.calculateTax())
-  }
-
+  //updates income amount whenever an input is changed
   updateIncome() {
     this.setState({
       income: this.state.wage*this.state.wageMultiplier*this.state.currencyMultiplier, 
     }, () => this.calculateTax())
   }
 
+  //calculates taxes and net income based on income
   calculateTax() {
     let incomeTax=0;
     if(this.state.isScotland==="true") {
@@ -125,29 +112,13 @@ export class App extends React.Component {
       incomeTax = new TaxCalculator('incomeTax', [150000, 50270, 12570], [0.45, 0.4, 0.2], this.state.income)
     }
     const insuranceTax = new TaxCalculator('insuranceTax', [50270, 12570], [0.0325, 0.1325], this.state.income)
+
     this.setState({
-      incomeTax: incomeTax.taxAmount(),
-      insuranceTax: insuranceTax.taxAmount(),
-      netIncome: this.state.income - incomeTax.taxAmount() - insuranceTax.taxAmount()
+      taxes: [incomeTax.taxAmount(), 
+        insuranceTax.taxAmount(), 
+        this.state.income - incomeTax.taxAmount() - insuranceTax.taxAmount()
+      ],
     })
-  }
-  
-  renderResults() {
-    if(this.state.netIncome) {
-      return (
-        <section id="results">
-          <Results income={this.state.income}
-            incomeTax={this.state.incomeTax}
-            insuranceTax={this.state.insuranceTax}
-            netIncome={this.state.netIncome}
-            currency={this.state.currency}
-            currencySymbol={this.state.currencySymbol}
-            currencyMultiplier={this.state.currencyMultiplier}
-            />
-        </section>
-      )
-    }
-    return
   }
 
   render() {
@@ -156,21 +127,23 @@ export class App extends React.Component {
             <header>
               <Header />
             </header>
-            <section id="form">
-              <Form handleWage={this.handleWage} 
-                changeWageType={this.changeWageType}
+            <section id="form" aria-label="If you are using a screen reader, please note that the results will only appear after you have filled every part of the form. There is no submit button, the results will automatically appear once the form has been filled.">
+              <Form
                 showHoursWorked={this.state.showHoursWorked}
-                handleHoursWorked={this.handleHoursWorked}
                 salaryStep={this.state.salaryStep}
-                switchCurrency={this.switchCurrency}
                 currency={this.state.currency}
-                handleScotland={this.handleScotland}
+                handleInputs={this.handleInputs}
                 />
             </section>
-            {this.renderResults()}
-            <section id="learn-more">
+            {this.state.taxes[2] ? <Results 
+            taxes={this.state.taxes}
+            income={this.state.income}
+            currency={this.state.currency}
+            currencyMultiplier={this.state.currencyMultiplier}
+            workHours={this.state.hoursWorked}
+            wageType={this.state.wageType}
+            />: ''}
               <LearnMore />
-            </section>
           </main>
     )
   }
