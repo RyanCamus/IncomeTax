@@ -29,14 +29,11 @@ export class App extends React.Component {
 
   //collects all inputted values from Form.js, initiates further processing if necessary
   handleInputs(value, name) {
-    if(name==="currency") {
-      this.switchCurrency(value);
-    } else if(name==="wageType") {
-      this.changeWageType(value)
-    } else if(name==="hoursWorked") {
-      this.setState({hoursWorked: value}, () => this.changeWageType('hourly'))
-    } else {
-      this.setState({[name]: value}, () => this.updateIncome())
+    switch(name) {
+      case "currency": this.switchCurrency(value); break;
+      case "wageType": this.changeWageType(value); break;
+      case "hoursWorked": this.setState({hoursWorked: value}, () => this.changeWageType('hourly')); break;
+      default: this.setState({[name]: value}, () => this.updateIncome()); break;
     }
   }
   

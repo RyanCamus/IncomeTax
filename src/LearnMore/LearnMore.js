@@ -46,17 +46,15 @@ export class LearnMore extends React.Component {
                     <li>You are not self-employed</li>
                     <li>You do not have allowances such as marriage, student, disability, state pension or age-related allowances.</li><br />
                     <li>This guide is for employees, not employers</li>
-                    <li>These values are valid until April 5th, 2023. If it is already past that date, shoot me an email.</li>
+                    <li>These values are valid until April 5th, 2023. If it is already past that date, let me know!</li>
                     <li>Currency exchange rates are updated daily. Want to add another currency? Let me know!</li>
-                    <li>For suggestions and/or issues with this app, email me!</li>
-                </ul>
-                <ul>Next steps:
-                    <li>Deploy</li>
+                    <li>For suggestions and/or issues with this app, visit my <a href="https://github.com/RyanCamus/IncomeTax">GitHub</a></li>
                 </ul>
                 <ul aria-label="Wow I didn't expect anyone to make it this far. Thanks for using my app, I hope you found it useful! Let me know if there's anything I could have done to make your experience better: ryan_camus@hotmail.fr">This project is made possible by:
                     <li>create-react-app</li>
                     <li>react-tabs</li>
                     <li><a href="https://exchangerate.host/">exchangerate.host</a>'s awesome free API</li>
+                    <li>Hosted by Netlify</li>
                 </ul>
             </div>
             </section>

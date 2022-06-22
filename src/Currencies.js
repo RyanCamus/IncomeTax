@@ -1,6 +1,5 @@
 export const Currencies = {
     async getExchangeRate(targetCurrency) {
-        //const key = '82089dbd86f5b300831c';
         const baseUrl = 'https://api.exchangerate.host';
         const convertUrl = '/convert?from=';
         const currencies = `${targetCurrency}&to=GBP`;
